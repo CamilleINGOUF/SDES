@@ -81,6 +81,20 @@ public class sdes
 		return ls;
 	}
 	
+	public static BitSet ip(BitSet b)
+	{
+		BitSet bt = new BitSet(8);
+		if(b.get(0)) bt.set(3);
+		if(b.get(1)) bt.set(0);
+		if(b.get(2)) bt.set(2);
+		if(b.get(3)) bt.set(4);
+		if(b.get(4)) bt.set(6);
+		if(b.get(5)) bt.set(1);
+		if(b.get(6)) bt.set(7);
+		if(b.get(7)) bt.set(5);
+		return bt;
+	}
+	
 	public static void printBits(String prompt, BitSet b, int nb_bits) 
 	{
       System.out.print(prompt + " ");
@@ -107,5 +121,13 @@ public class sdes
 		
 		printBits("k1 = ", keys[0], 8);
 		printBits("k2 = ", keys[1], 8);
+		
+		BitSet letterA = new BitSet(8);
+		letterA.set(1);
+		letterA.set(7);
+		printBits("A = ", letterA, 8);
+		
+		letterA = sdes.ip(letterA);
+		printBits("IP(A) = ", letterA, 8);
 	}
 }
