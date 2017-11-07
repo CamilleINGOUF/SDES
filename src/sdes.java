@@ -95,6 +95,91 @@ public class sdes
 		return bt;
 	}
 	
+	public static BitSet ep(BitSet b)
+	{
+		BitSet bt = new BitSet(8);
+		
+		if(b.get(0))
+		{
+			bt.set(1);
+			bt.set(7);
+		}
+		
+		if(b.get(1))
+		{
+			bt.set(2);
+			bt.set(4);
+		}
+		
+		if(b.get(2))
+		{
+			bt.set(3);
+			bt.set(5);
+		}
+		
+		if(b.get(3))
+		{
+			bt.set(0);
+			bt.set(6);
+		}
+		
+		return bt;
+	}
+	
+	public static BitSet f(BitSet b,BitSet k)
+	{
+		BitSet bt = new BitSet(4);
+		
+		BitSet ep = sdes.ep(b);
+		ep.xor(k);
+		
+		BitSet g = new BitSet(4);
+		BitSet d = new BitSet(4);
+		
+		if(ep.get(0)) g.set(0);
+		if(ep.get(1)) g.set(1);
+		if(ep.get(2)) g.set(2);
+		if(ep.get(3)) g.set(3);
+		if(ep.get(4)) d.set(0);
+		if(ep.get(5)) d.set(1);
+		if(ep.get(6)) d.set(2);
+		if(ep.get(7)) d.set(3);
+		
+		
+		
+		return bt;
+	}
+	
+	public static BitSet fk(BitSet b,BitSet k)
+	{
+		BitSet bt = new BitSet(8);
+		
+		BitSet G = new BitSet(4);
+		BitSet D = new BitSet(4);
+		
+		if(b.get(0)) G.set(0);
+		if(b.get(1)) G.set(1);
+		if(b.get(2)) G.set(2);
+		if(b.get(3)) G.set(3);
+		if(b.get(4)) D.set(0);
+		if(b.get(5)) D.set(1);
+		if(b.get(6)) D.set(2);
+		if(b.get(7)) D.set(3);
+		
+		G.xor(f(D,k));
+		
+		if(G.get(0)) bt.set(0);
+		if(G.get(1)) bt.set(1);
+		if(G.get(2)) bt.set(2);
+		if(G.get(3)) bt.set(3);
+		if(D.get(0)) bt.set(4);
+		if(D.get(1)) bt.set(5);
+		if(D.get(2)) bt.set(6);
+		if(D.get(3)) bt.set(7);
+		
+		return bt;
+	}
+	
 	public static void printBits(String prompt, BitSet b, int nb_bits) 
 	{
       System.out.print(prompt + " ");
@@ -129,5 +214,8 @@ public class sdes
 		
 		letterA = sdes.ip(letterA);
 		printBits("IP(A) = ", letterA, 8);
+		
+		letterA = sdes.fk(letterA, keys[0]);
+		printBits("fk(A) = ", letterA, 8);
 	}
 }
