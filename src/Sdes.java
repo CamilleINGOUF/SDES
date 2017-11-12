@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Scanner;
 
-public class sdes 
+public class Sdes 
 {
 	
 	public static final int[][] S0 = {{1,0,3,2},{3,2,1,0},{0,2,1,3},{3,1,3,2}};
@@ -204,7 +204,7 @@ public class sdes
 	{
 		BitSet bt;
 		
-		BitSet ep = sdes.ep(b);
+		BitSet ep = Sdes.ep(b);
 //		printBits("EP(A) = ", ep, 8);
 		ep.xor(k);
 //		printBits("k     = ", k, 8);
@@ -297,15 +297,15 @@ public class sdes
 	{
 		BitSet[] keys = createKeys(key);
 		
-		BitSet cryptedLetter = sdes.ip(binaryLetter);
+		BitSet cryptedLetter = Sdes.ip(binaryLetter);
 		
-		cryptedLetter = sdes.fk(cryptedLetter, keys[0]);
+		cryptedLetter = Sdes.fk(cryptedLetter, keys[0]);
 		
-		cryptedLetter = sdes.sw(cryptedLetter);
+		cryptedLetter = Sdes.sw(cryptedLetter);
 		
-		cryptedLetter = sdes.fk(cryptedLetter, keys[1]);
+		cryptedLetter = Sdes.fk(cryptedLetter, keys[1]);
 		
-		cryptedLetter = sdes.ip1(cryptedLetter);
+		cryptedLetter = Sdes.ip1(cryptedLetter);
 		
 		return cryptedLetter;
 	}
@@ -427,24 +427,24 @@ public class sdes
 		k.clear(8);
 		printBits("k = ", k, 10);
 		
-//		BitSet[] keys = createKeys(k);
+		BitSet[] keys = createKeys(k);
 		
 		BitSet letterA = new BitSet(8);
 		letterA.set(1);
 		letterA.set(7);
 		printBits("A = ", letterA, 8);
-//		
-//		BitSet ip = ip(letterA);
-//		printBits("IP(A) = ", ip, 8);
-//		
-//		BitSet fk = fk(ip,keys[0]);
-//		printBits("fk(A) = ",fk, 8);
-//		
-//		BitSet sw = sw(fk);
-//		printBits("sw(A) = ",sw, 8);
-//		
-//		BitSet fk2 = fk(sw,keys[1]);
-//		printBits("fk(A) = ",fk2, 8);
+		
+		BitSet ip = ip(letterA);
+		printBits("IP(A) = ", ip, 8);
+		
+		BitSet fk = fk(ip,keys[0]);
+		printBits("fk(A) = ",fk, 8);
+		
+		BitSet sw = sw(fk);
+		printBits("sw(A) = ",sw, 8);
+		
+		BitSet fk2 = fk(sw,keys[1]);
+		printBits("fk(A) = ",fk2, 8);
 		
 		BitSet cryptedLetter = cryptLetterSDES(letterA, k);
 		printBits("Crypted A = ", cryptedLetter, 8);
@@ -452,23 +452,34 @@ public class sdes
 	
 	public static void main(String[] args) throws FileNotFoundException 
 	{
-		BitSet k = new BitSet(10);
-		k.set(0,10);
-		k.clear(4);
-		k.clear(7);
-		k.clear(8);
+		if(args.length != 3)
+		{
+			System.err.println("Sdes [key] [clearFile] [outputFile]");
+			System.exit(0);
+		}
 		
-		BitSet letterA = new BitSet(8);
-		letterA.set(1);
-		letterA.set(7);
+		String key = new String(args[0]);
 		
-		debug();
+		if(key.length() != 10)
+		{
+			System.err.println("[!] Key must be 10 bits long.");
+			System.exit(0);
+		}
 		
-		ArrayList<BitSet> translatedText = StringToBitSet(readFile("texteClair.txt"));
-		writeBitSetsToFile(translatedText, "texteBinaire.txt");
+		String inputFile = new String(args[1]);
+		String outputFile = new String(args[2]);
+	
+		BitSet keyBitSet = new BitSet(10);
+		for(int  i = 0; i < key.length(); i++)
+			if(key.charAt(i) == '1') keyBitSet.set(i);
+		
+//		debug();
+		
+		ArrayList<BitSet> translatedText = StringToBitSet(readFile(inputFile));
+		writeBitSetsToFile(translatedText, "binaire"+inputFile);
 		ArrayList<BitSet> sdesText = new ArrayList<BitSet>();
 		for(BitSet b : translatedText)
-			sdesText.add(cryptLetterSDES(b, k));
-		writeBitSetsToFile(sdesText, "texteSDES.txt");
+			sdesText.add(cryptLetterSDES(b, keyBitSet));
+		writeBitSetsToFile(sdesText, outputFile);
 	}
 }
