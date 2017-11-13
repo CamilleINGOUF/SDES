@@ -407,10 +407,16 @@ public class Sdes
 	{
 		try
 		{
-		    PrintWriter writer = new PrintWriter(filename, "UTF-8");
+		    PrintWriter writerBits = new PrintWriter("binaire"+filename, "UTF-8");
+		    PrintWriter writerChars = new PrintWriter(filename, "UTF-8");
 		    for(BitSet b : bs)
-		    	writer.print(toStringBitSet(b,8));
-		    writer.close();
+		    {
+		    	writerBits.print(toStringBitSet(b,8));
+		    	writerChars.print((char)BitSetToInt(b));
+		    	System.out.println(BitSetToInt(b));
+		    }
+		    writerBits.close();
+		    writerChars.close();
 		} 
 		catch (IOException e) 
 		{
@@ -450,6 +456,22 @@ public class Sdes
 		printBits("Crypted A = ", cryptedLetter, 8);
 	}
 	
+	public static int BitSetToInt(BitSet b)
+	{
+		int res = 0;
+		
+		if(b.get(0)) res+= 128;
+		if(b.get(1)) res+= 64;
+		if(b.get(2)) res+= 32;
+		if(b.get(3)) res+= 16;
+		if(b.get(4)) res+= 8;
+		if(b.get(5)) res+= 4;
+		if(b.get(6)) res+= 2;
+		if(b.get(7)) res+= 1;
+		
+		return res;
+	}
+	
 	public static void main(String[] args) throws FileNotFoundException 
 	{
 		if(args.length != 3)
@@ -473,13 +495,14 @@ public class Sdes
 		for(int  i = 0; i < key.length(); i++)
 			if(key.charAt(i) == '1') keyBitSet.set(i);
 		
-//		debug();
+		//debug();
 		
 		ArrayList<BitSet> translatedText = StringToBitSet(readFile(inputFile));
-		writeBitSetsToFile(translatedText, "binaire"+inputFile);
 		ArrayList<BitSet> sdesText = new ArrayList<BitSet>();
 		for(BitSet b : translatedText)
+		{
 			sdesText.add(cryptLetterSDES(b, keyBitSet));
+		}
 		writeBitSetsToFile(sdesText, outputFile);
 	}
 }
